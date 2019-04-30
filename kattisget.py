@@ -1,3 +1,4 @@
+#!/usr/bin/python3
 import requests
 import urllib.request
 import time

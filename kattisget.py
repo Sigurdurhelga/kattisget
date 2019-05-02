@@ -30,9 +30,12 @@ if __name__ == '__main__':
   if not os.path.exists(problemPath):
     with open(problemPath, 'w') as f:
       f.write(cppInit)
-  
+
   soup = BeautifulSoup(response.text, "html.parser")
-  tcs = soup.find_all('pre')
+  pres = [s.find_all('pre') for s in soup.find_all('table', class_='sample')]
+  tcs = []
+  for x in pres:
+    tcs.extend(x)
   tcs = [s.text.replace('<pre>','') for s in tcs]
   tcs = [s.replace('</pre>','') for s in tcs]
   tccount = 1

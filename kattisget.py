@@ -96,13 +96,13 @@ if __name__ == '__main__':
     makeInit = "compile:\n\tg++ -std=c++17 -Wall -static -O2 {0} -o run.out\ntest:\n\tg++ -std=c++17 -Wall -static -O2 {0} -o run.out".format(problemId+".cpp")
     for k in range(0,len(tcs),2):
       makeInit += "\n\t./run.out < in{}.txt > temp".format(k+1)
-      makeInit += "\n\tdiff out{}.txt temp".format(k+1)
+      makeInit += "\n\tdiff -y out{}.txt temp".format(k+1)
       
   else:
     makeInit = "test:\n"
     for k in range(0, len(tcs), 2):
       makeInit += "\n\tpython {}.py  < in{}.txt > temp".format(problemId ,k+1)
-      makeInit += "\n\tdiff out{}.txt temp".format(k+1)
+      makeInit += "\n\tdiff -y out{}.txt temp".format(k+1)
 
 
 

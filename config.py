@@ -1,4 +1,5 @@
 config = {
-  "enable-hattis": False,
-  "kattisrclocation":"~/.kattisrc"
+  "enable-hattis": True,
+  "kattisrcs":["~/.kattisrc", "~/.rukattisrc"],
+  "force-hattis":True
 }

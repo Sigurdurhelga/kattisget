@@ -93,7 +93,8 @@ def setup_testcases(resp, problemid, problemfile):
             tccount += 1
     if(config["enable-hattis"]):
         makeInit += "\nsubmit:"
-        makeInit += "\n\thattis {} {} --conf {}".format(problemid, problemfile, config["kattisrclocation"])
+        for rc in config["kattisrcs"]:
+            makeInit += "\n\thattis {} {} --conf {}".format(problemid, problemfile, rc)
 
     with open(problemDir+'/makefile', 'w') as f:
         f.write(makeInit)

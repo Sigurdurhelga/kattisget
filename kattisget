@@ -15,46 +15,31 @@ parser.add_argument(
     help="The problem id on kattis.com, can be a portion of the problem id, just enough to be unique")
 parser.add_argument("-l", "--language",
                     help="The language you wish to use, default=cpp",
-                    default="cpp",
+                    default=config['default_language'],
                     choices=["cpp", "py", "py2"])
 
-parser.add_argument(
-    "--hint", help="Attempt to retrieve hints from cpbook.net", required=False)
 
 args = parser.parse_args()
 
-cppInit = """#include <bits/stdc++.h>
+language_to_extension = {
+    'py' :'.py',
+    'py2':'.py',
+    'py3':'.py',
+    'cpp':'.cpp'
+}
+
+language_to_template = {
+    'cpp' : """#include <bits/stdc++.h>
 using namespace std;
 
 int main(){
 
   return 0;
 }
-"""
-
-pythonTemplate = '''
-print('IMPLEMENT ME')
-'''
-
-# this is temporary until we decided to add more language support
-usePy = args.language != "cpp"
-
-
-def get_hints(id):
-    url = 'https://cpbook.net/methodstosolve'
-    response = requests.get(url, verify=False)
-    soup = BeautifulSoup(response.text, "html.parser")
-    pres = [s.find_all('tr') for s in soup.find_all(
-        'table', id='problemtable')][0][1:]
-    for x in pres:
-        title = x.find_all('td')[0].get_text()
-        hint = x.find_all('td')[3].get_text()
-
-        if title == id:
-            return hint
-
-    return 'no hint found'
-
+""",
+    'py' : """print('IMPLEMENT ME')
+    """
+}
 
 def setup_testcases(resp, problemid, problemfile):
     soup = BeautifulSoup(resp.text, "html.parser")
@@ -76,7 +61,7 @@ def setup_testcases(resp, problemid, problemfile):
 
     tccount = 1
 
-    if not usePy:
+    if args.language == "cpp":
         makeInit = "compile:\n\tg++ -std=c++17 -Wall -static -O2 {0} -o run.out\ntest:\n\tg++ -std=c++17 -Wall -static -O2 {0} -o run.out".format(
             problemId+".cpp")
         for k in range(0, len(tcs), 2):
@@ -84,13 +69,13 @@ def setup_testcases(resp, problemid, problemfile):
             makeInit += "\n\tdiff -y out{}.txt temp".format(tccount)
             tccount += 1
 
-    else:
+    elif args.language.startswith('py'):
         makeInit = "test:\n"
         for k in range(0, len(tcs), 2):
-            makeInit += "\n\tpython {}.py  < in{}.txt > temp".format(
-                problemId, tccount)
+            makeInit += "\n\tpython {}.py  < in{}.txt > temp".format(problemId, tccount)
             makeInit += "\n\tdiff -y out{}.txt temp".format(tccount)
             tccount += 1
+
     if(config["enable-hattis"]):
         makeInit += "\nsubmit:"
         for rc in config["kattisrcs"]:
@@ -109,7 +94,7 @@ if __name__ == '__main__':
 
     problemId = response.url.split('/')[-1]
     problemDir = './'+problemId
-    problemFile = problemId + (".cpp" if not usePy else ".py")
+    problemFile = problemId + language_to_extension[args.language]
 
     problemPath = problemDir+"/"+ problemFile
 
@@ -117,13 +102,5 @@ if __name__ == '__main__':
         os.mkdir(problemDir)
     if not os.path.exists(problemPath):
         with open(problemPath, 'w') as f:
-            if usePy:
-                f.write(pythonTemplate)
-            else:
-                f.write(cppInit)
-
+            f.write(language_to_template[args.language])
     setup_testcases(response, problemId, problemFile)
-
-    if args.hint:
-        print('Done creating directory, fetching hint')
-        print(get_hints('\033[95m'+sys.argv[1])+'\033[0m')

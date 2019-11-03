@@ -41,8 +41,8 @@ int main(){
     """
 }
 
-def setup_testcases(resp, problemid, problemfile):
-    soup = BeautifulSoup(resp.text, "html.parser")
+def setup_testcases(response, problemid, problemfile, problemDir):
+    soup = BeautifulSoup(response.text, "html.parser")
     pres = [s.find_all('pre') for s in soup.find_all('table', class_='sample')]
     tcs = []
     for x in pres:
@@ -84,6 +84,23 @@ def setup_testcases(resp, problemid, problemfile):
     with open(problemDir+'/makefile', 'w') as f:
         f.write(makeInit)
 
+def setup_description(response, problemId, problemDir):
+    """
+        This is a place holder function to be fixed
+        when more nenn is found.
+    """
+    soup = BeautifulSoup(response.text, "html.parser")
+
+    desc_text = """
+    {}
+
+    {}
+    """.format(
+        soup.select('.headline-wrapper')[0].get_text(),
+        soup.select('.problembody')[0].get_text()
+    )
+    with open(problemDir+"/"+problemId+".txt", 'w') as f:
+        f.write(desc_text)
 
 if __name__ == '__main__':
     url = 'https://open.kattis.com/search?q='+args.problemid
@@ -103,4 +120,7 @@ if __name__ == '__main__':
     if not os.path.exists(problemPath):
         with open(problemPath, 'w') as f:
             f.write(language_to_template[args.language])
-    setup_testcases(response, problemId, problemFile)
+
+    setup_testcases(response, problemId, problemFile, problemDir)
+    setup_description(response, problemId, problemDir)
+

@@ -91,7 +91,7 @@ def setup_testcases(response, problemid, problemfile, problemDir):
         for rc in config["kattisrcs"]:
             makeInit += "\n\thattis {} {} --conf {}".format(problemid, problemfile, rc)
             if hattis_lang:
-                makeInit += "-l \"{}\"".format(hattis_lang)
+                makeInit += " -l \"{}\"".format(hattis_lang)
 
     with open(problemDir+'/makefile', 'w') as f:
         f.write(makeInit)

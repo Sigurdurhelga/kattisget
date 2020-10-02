@@ -65,6 +65,10 @@ def setup_testcases(response, problemid, problemfile, problemDir):
         with open(problemDir+'/out'+str(tccount)+".txt", 'w') as f:
             f.write(tcs[k+1])
         tccount += 1
+    with open(problemDir+'/user_in.txt', 'w') as f:
+        f.write(tcs[0])
+    with open(problemDir+'/user_out.txt', 'w') as f:
+        f.write(tcs[1])
 
     tccount = 1
     hattis_lang = ""
@@ -85,6 +89,9 @@ def setup_testcases(response, problemid, problemfile, problemDir):
             makeInit += "\n\tpython {}.py  < in{}.txt > temp".format(problemId, tccount)
             makeInit += "\n\tdiff -y out{}.txt temp".format(tccount)
             tccount += 1
+
+    makeInit += "\n\t./run.out < user_in.txt > temp".format(tccount)
+    makeInit += "\n\tdiff -y user_out.txt temp".format(tccount)
 
     if(config["enable-hattis"]):
         makeInit += "\nsubmit:"
